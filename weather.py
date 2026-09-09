@@ -1,4 +1,7 @@
+import statistics
 from datetime import datetime
+
+
 series_titles = ["Maximum temperature (Degree C)", "Minimum temperature (Degree C)", "Rainfall amount (millimetres)"]
 
 def mean(in_series):
@@ -14,6 +17,9 @@ def variance(in_series):
     return sum((x - avg) ** 2 for x in valid_values) / len(valid_values)
 
 def standard_deviation(in_series):
+    var_result = variance(in_series)
+    std_result = var_result ** 0.5
+    return std_result
     val = variance(in_series)
     if val is None:
         return None
@@ -38,7 +44,7 @@ def filter_series(year_series, month_series, day_series, data_series, max_date=N
     return filtered
 
 def interquartile_range(in_series):
-    data = sorted(in_series)
+    data = sorted([x for x in in_series if x is not None])
     mid = len(data) // 2
 
     if len(data) % 2 == 0:
@@ -54,6 +60,10 @@ def interquartile_range(in_series):
     return q3 - q1
 
 def range_(in_series):
+    data = sorted([x for x in in_series if x is not None])
+    if len(data) == 0:
+        return None
+    return data[-1] - data[0]
     range_sort = list(sorted(in_series))
     range_result = range_sort[-1] - range_sort[0]
     return range_result
@@ -84,8 +94,14 @@ def get_user_choice(options):
 def menu(data_table):
     print("Select a data series:")
     choice = get_user_choice(series_titles)
-    series = data_table[choice]
-    print(f"Mean: {mean(data_table[choice])}")
+    data = data_table[choice]
+    print(
+        f"Mean: {mean(data)}, "
+        f"Variance: {variance(data)}, "
+        f"Standard Deviation: {standard_deviation(data)}, "
+        f"Interquartile Range: {interquartile_range(data)}, "
+        f"Range: {range_(data)}"
+)
 
 if __name__ == "__main__":
     data = read_csv('weather.csv')
